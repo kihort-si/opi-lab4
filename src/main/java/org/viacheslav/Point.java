@@ -44,14 +44,6 @@ public class Point implements Serializable {
         this.x = x;
         this.y = y;
         this.r = r;
-        check();
-    }
-
-    public void check() {
-        date = new Date(System.currentTimeMillis());;
-        result = (x >= 0 && y >= 0 && (y <= r / 2 - 0.5 * x)) ||
-                (x < 0 && y <= 0 && (Math.sqrt(x * x + y * y) <= r)) ||
-                (x < 0 && y >= 0 && (x >= -r) && (y <= r));
     }
 
     @Override

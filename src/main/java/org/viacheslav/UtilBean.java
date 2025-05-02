@@ -8,10 +8,12 @@ import java.util.logging.Logger;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.*;
+import org.viacheslav.services.PointServiceImplementation;
 
 @Named("utilBean")
 @ApplicationScoped
@@ -32,6 +34,9 @@ public class UtilBean implements Serializable {
     private ArrayList<Point> pointsList;
 
     private DBController dbController;
+
+    @Inject
+    private PointServiceImplementation pointService;
 
     @PostConstruct
     public void init() {
@@ -68,8 +73,7 @@ public class UtilBean implements Serializable {
     public String checkAndAdd() {
         logger.info("Пришёл запрос на добавление точки: x = " + x + ", y = " + y + ", r = " + r);
         logger.info("SessionID=" + getSessionId());
-        Point point = new Point(x, y, r);
-        point.setSession(getSessionId());
+        Point point = pointService.createAndCheckPoint(x, y, r, getSessionId());
         dbController.addPoint(point);
         pointsList.add(point);
         return "goToMain?faces-redirect=true";

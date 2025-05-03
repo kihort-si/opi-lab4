@@ -1,5 +1,6 @@
 package org.viacheslav.utils;
 
+import jakarta.servlet.ServletContextListener;
 import lombok.experimental.UtilityClass;
 
 import javax.management.*;
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @UtilityClass
-public class MBeanRegistry {
+public class MBeanRegistry implements ServletContextListener {
     private static final Map<Object, ObjectName> beans = new HashMap<>();
 
     public static void registerBean(Object bean, String name) {

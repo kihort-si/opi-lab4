@@ -9,7 +9,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-    <title>Main | Web #3</title>
+    <title>Main | Opi #4</title>
     <link rel="icon" type="img/jpg" href="img/baby.jpg"/>
 
     <h:outputStylesheet name="src/main.css"/>
@@ -17,10 +17,8 @@
 
 <h:body>
 
-
-
     <header>
-        <h2><a href="https://github.com/petrovviacheslav">Petrov Viacheslav Markovich <br/> P3208 lab3 var.89201</a>
+        <h2><a href="https://github.com/kihort-si/opi-lab4">Petrov and Vasiliev <br/> P3208 lab4 var.1583</a>
         </h2>
     </header>
 
@@ -147,8 +145,11 @@
                         <f:selectItem itemValue="5.0" itemLabel="5"/>
                         <f:validateRequired/>
                         <f:validateDoubleRange minimum="1" maximum="5"/>
+                        <f:ajax render="shape_area"/>
                     </h:selectOneMenu>
                 </div>
+
+                <h:outputText id="shape_area" value="Площадь фигуры для последней точки: #{utilBean.area}"/>
 
                 <h:messages id="messages" showDetail="false" autoUpdate="true"/>
 
@@ -171,6 +172,8 @@
         </div>
 
         <h:link id="movingElement" value="На главную страничку" outcome="goToIndex" styleClass="main_link"/>
+
+
 
         <p:dataTable id="table-check" value="#{utilBean.pointsList}" var="point">
             <p:column headerText="ID">

@@ -17,6 +17,7 @@ public class PointServiceImplementation implements PointService {
     public Point createAndCheckPoint(double x, double y, double r, String session) {
         Point point = new Point(x, y, r);
         point.setDate(new Date(System.currentTimeMillis()));
+        System.out.println(point.toString());
         point.setResult(areaChecker.check(x, y, r));
         point.setSession(session);
         return point;

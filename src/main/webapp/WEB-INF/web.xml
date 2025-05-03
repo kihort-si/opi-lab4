@@ -29,4 +29,8 @@
         <param-value>/jakarta.faces.resource/*</param-value>
     </context-param>
 
+<!--    <listener>-->
+<!--        <listener-class>org.viacheslav.utils.MBeanRegistry</listener-class>-->
+<!--    </listener>-->
+
 </web-app>

@@ -32,7 +32,6 @@ dependencies {
 //        // PrimeFaces Extensions
 
 
-
     // Hibernate ORM
     implementation 'org.hibernate:hibernate-core:6.6.1.Final'
 
@@ -50,7 +49,7 @@ dependencies {
 }
 
 war {
-    archiveFileName = 'web-3.war'
+    archiveFileName = 'opi-4.war'
     webAppDirectory = file('src/main/webapp')
 }
 

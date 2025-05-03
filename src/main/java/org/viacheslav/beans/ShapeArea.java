@@ -1,6 +1,13 @@
 package org.viacheslav.beans;
 
-public class ShapeArea implements ShapeAreaMBean {
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
+import java.io.Serializable;
+
+@Named("shapeArea")
+@ApplicationScoped
+public class ShapeArea implements ShapeAreaMBean, Serializable {
     private double r = 1.0;
 
     @Override

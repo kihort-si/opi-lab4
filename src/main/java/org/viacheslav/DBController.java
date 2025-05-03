@@ -69,8 +69,8 @@ public class DBController implements Serializable {
 
     public void clear(String sessionId) {
         transaction.begin();
-        //manager.createQuery("delete from Point").executeUpdate();
-        manager.createQuery(String.format("delete from Point where session=\"%s\"", sessionId)).executeUpdate();
+        manager.createQuery("delete from Point").executeUpdate();
+        //manager.createQuery(String.format("delete from Point where session=\"%s\"", sessionId)).executeUpdate();
         logger.info("Таблица очищена");
         transaction.commit();
     }

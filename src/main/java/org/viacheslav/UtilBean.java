@@ -13,6 +13,8 @@ import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.*;
+import org.viacheslav.beans.PointCounter;
+import org.viacheslav.beans.ShapeArea;
 import org.viacheslav.services.PointServiceImplementation;
 
 @Named("utilBean")
@@ -25,7 +27,7 @@ public class UtilBean implements Serializable {
     @Getter
     @Setter
     private double y;
-    @Setter
+
     @Getter
     private double r;
 
@@ -33,10 +35,17 @@ public class UtilBean implements Serializable {
     @Getter
     private ArrayList<Point> pointsList;
 
+    @Getter
+    private double area;
+
     private DBController dbController;
 
     @Inject
     private PointServiceImplementation pointService;
+
+    private final PointCounter pointCounter = new PointCounter();
+    private final ShapeArea shapeArea = new ShapeArea();
+
 
     @PostConstruct
     public void init() {
@@ -48,13 +57,23 @@ public class UtilBean implements Serializable {
         if (pointsList == null) {
             pointsList = new ArrayList<>();
         }
+        shapeArea.setRadius(r);
+        area = shapeArea.getArea();
+        pointCounter.setTotalPoints(pointsList.size());
     }
 
     public String clear() {
         dbController.clear(getSessionId());
-        //pointsList.clear();
+        pointsList.clear();
         pointsList = dbController.getAll();
+        pointCounter.setTotalPoints(pointsList.size());
         return "goToMain?faces-redirect=true";
+    }
+
+    public void setR(double r) {
+        this.r = r;
+        shapeArea.setRadius(r);
+        this.area = shapeArea.getArea();
     }
 
     private String getSessionId() {
@@ -76,6 +95,7 @@ public class UtilBean implements Serializable {
         Point point = pointService.createAndCheckPoint(x, y, r, getSessionId());
         dbController.addPoint(point);
         pointsList.add(point);
+        pointCounter.addPoint(point);
         return "goToMain?faces-redirect=true";
     }
 

@@ -26,6 +26,6 @@ public class ShapeArea implements ShapeAreaMBean, Serializable {
         double triangle = (r * r) / 4;
         double quarterCircle = (Math.PI * r * r) / 4;
         double rectangle = r * r;
-        return triangle + quarterCircle + rectangle;
+        return (double) Math.round((triangle + quarterCircle + rectangle) * 100) / 100;
     }
 }

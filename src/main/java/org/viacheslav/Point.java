@@ -46,6 +46,13 @@ public class Point implements Serializable {
         this.r = r;
     }
 
+    public Point(double x, double y, double r, boolean result) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.result = result;
+    }
+
     @Override
     public String toString() {
         return "x = " + x + ", y = " + y + ", r = " + r + ", date = " + date + ", isHit = " + result;

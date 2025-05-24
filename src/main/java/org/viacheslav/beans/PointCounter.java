@@ -3,7 +3,6 @@ package org.viacheslav.beans;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.viacheslav.Point;
-import org.viacheslav.services.AreaChecker;
 
 import javax.management.*;
 import java.io.Serializable;
@@ -14,9 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PointCounter implements PointCounterMBean, NotificationBroadcaster, Serializable {
     private final AtomicInteger totalPoints = new AtomicInteger();
     private final AtomicInteger pointsInArea = new AtomicInteger();
-//    private int totalPoints = 0;
-//    private int pointsInArea = 0;
-//    private long sequenceNumber = 1;
 
     private final NotificationBroadcasterSupport broadcaster = new NotificationBroadcasterSupport();
 

@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id 'jacoco'
 }
 
 group = 'org.viacheslav'
@@ -46,6 +47,17 @@ dependencies {
     // Тестовые зависимости с использованием JUnit 5
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+
+    // Mockito для моков
+    testImplementation 'org.mockito:mockito-core:5.3.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1' // для интеграции с JUnit 5
+
+    testImplementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    testImplementation 'jakarta.platform:jakarta.jakartaee-web-api:9.0.0'
 }
 
 war {
@@ -57,6 +69,22 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+
+
+jacoco {
+    toolVersion = "0.8.11" // Актуальная версия JaCoCo
+}
+
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // Генерировать отчёт после тестов
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
 }

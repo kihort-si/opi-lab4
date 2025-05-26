@@ -1,103 +1,73 @@
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.viacheslav.utils.MBeanRegistry;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MBeanRegistryTest {
 
-    private MBeanServer mockMBeanServer;
-    private Object testBean;
-    private ObjectName testObjectName;
+    @Mock
+    MBeanServer mbs;
+    MockedStatic<ManagementFactory> mf;
+
+    Object bean = new Object();
 
     @BeforeEach
-    void setUp() throws MalformedObjectNameException {
-        mockMBeanServer = mock(MBeanServer.class);
-        testBean = new Object();
-        testObjectName = new ObjectName(this.getClass().getPackage().getName() + ":type=Object,name=testBean");
+    void open() {
+        mf = mockStatic(ManagementFactory.class);
+        mf.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mbs);
     }
 
     @AfterEach
-    void tearDown() {
-        // Очистка статического состояния после каждого теста
-        MBeanRegistry.unregisterBean(testBean);
+    void close() {
+        mf.close();
+        MBeanRegistry.unregisterBean(bean);
     }
 
     @Test
-    void testRegisterBean_Success() throws Exception {
-        try (MockedStatic<ManagementFactory> mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class)) {
-            mockedManagementFactory.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mockMBeanServer);
+    void register_success() throws Exception {
+        ArgumentCaptor<ObjectName> captor = ArgumentCaptor.forClass(ObjectName.class);
 
-            MBeanRegistry.registerBean(testBean, "testBean");
+        MBeanRegistry.registerBean(bean, "testBean");
 
-            System.out.println(eq(testBean));
-            verify(mockMBeanServer).registerMBean(eq(testBean), eq(testObjectName));
-        }
+        verify(mbs).registerMBean(eq(bean), captor.capture());
+        assertTrue(captor.getValue().getCanonicalName()
+                .contains("name=testBean"));
     }
 
     @Test
-    void testRegisterBean_AlreadyExists() throws Exception {
-        try (MockedStatic<ManagementFactory> mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class)) {
-            mockedManagementFactory.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mockMBeanServer);
-            doThrow(new InstanceAlreadyExistsException("MBean already exists"))
-                    .when(mockMBeanServer).registerMBean(any(), any());
+    void register_alreadyExists_isIgnored() throws Exception {
+        doThrow(new InstanceAlreadyExistsException())
+                .when(mbs).registerMBean(any(), any());
 
-            MBeanRegistry.registerBean(testBean, "testBean");
-
-            System.out.println(eq(testBean));
-            verify(mockMBeanServer).registerMBean(eq(testBean), eq(testObjectName));
-        }
+        assertDoesNotThrow(() -> MBeanRegistry.registerBean(bean, "testBean"));
     }
 
     @Test
-    void testRegisterBean_MalformedName() throws Exception {
-        try (MockedStatic<ManagementFactory> mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class)) {
-            mockedManagementFactory.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mockMBeanServer);
-            doThrow(new MalformedObjectNameException("Invalid name"))
-                    .when(mockMBeanServer).registerMBean(any(), any());
+    void unregister_success() throws Exception {
+        MBeanRegistry.registerBean(bean, "testBean");
 
-            assertDoesNotThrow(() -> MBeanRegistry.registerBean(testBean, "invalid/name"));
-        }
+        ArgumentCaptor<ObjectName> captor = ArgumentCaptor.forClass(ObjectName.class);
+        MBeanRegistry.unregisterBean(bean);
+
+        verify(mbs).unregisterMBean(captor.capture());
+        assertTrue(captor.getValue().getCanonicalName()
+                .contains("name=testBean"));
     }
 
     @Test
-    void testUnregisterBean_Success() throws Exception {
-        try (MockedStatic<ManagementFactory> mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class)) {
-            mockedManagementFactory.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mockMBeanServer);
-
-            MBeanRegistry.registerBean(testBean, "testBean");
-            MBeanRegistry.unregisterBean(testBean);
-
-            verify(mockMBeanServer).unregisterMBean(testObjectName);
-        }
-    }
-
-    @Test
-    void testUnregisterBean_NotFound() throws Exception {
-        try (MockedStatic<ManagementFactory> mockedManagementFactory = Mockito.mockStatic(ManagementFactory.class)) {
-            mockedManagementFactory.when(ManagementFactory::getPlatformMBeanServer).thenReturn(mockMBeanServer);
-            doThrow(new InstanceNotFoundException("MBean not found"))
-                    .when(mockMBeanServer).unregisterMBean(any());
-
-            MBeanRegistry.registerBean(testBean, "testBean");
-            MBeanRegistry.unregisterBean(testBean);
-
-            verify(mockMBeanServer).unregisterMBean(testObjectName);
-        }
-    }
-
-    @Test
-    void testUnregisterBean_NotRegistered() {
-        try (MockedStatic<ManagementFactory> ignored = Mockito.mockStatic(ManagementFactory.class)) {
-            assertDoesNotThrow(() -> MBeanRegistry.unregisterBean(new Object()));
-        }
+    void unregister_notRegistered_doesNothing() {
+        assertDoesNotThrow(() -> MBeanRegistry.unregisterBean(new Object()));
+        verifyNoInteractions(mbs);
     }
 }

@@ -56,7 +56,6 @@ class DBControllerTest {
 
     @Test
     void getInstance_returnsSingletonInstance() {
-        // Тест синглтона
         DBController testInstance = new DBController();
 
         dbControllerMock = mockStatic(DBController.class);

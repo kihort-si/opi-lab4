@@ -24,7 +24,7 @@ public class MBeanRegistry implements ServletContextListener {
 
             System.out.printf("Зарегистрирован MBean: %s%n", objectName);
         } catch (InstanceAlreadyExistsException e) {
-            System.out.printf("MBean уже зарегистрирован: %s%n", e.getMessage());
+            // System.out.printf("MBean уже зарегистрирован: %s%n", e.getMessage());
         } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
             System.err.printf("Не удалось зарегистрировать MBean: %s%n", e.getMessage());
             e.printStackTrace();
